@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestione Entrate e Uscite</title>
+    <style>
+        #riga-dati td {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .tooltip-dettaglio {
+            display: none;
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            width: 160px;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        #riga-dati td:hover .tooltip-dettaglio {
+            display: block;
+        }
+
+        .txt-verde {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .txt-rosso {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .main-container {
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+
+        .label-esterna {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            /* Spazio tra textbox e combobox */
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .btn-verde {
+            background-color: #4CAF50;
+            font-size: 12px;
+        }
+
+        .btn-red {
+            background-color: #f44336;
+            font-size: 12px;
+        }
+
+        .btn-blue {
+            background-color: #3643f4;
+            font-size: 12px;
+        }
+
+        .btn:hover {
+            background-color: #218883;
+        }
+
+        /* Stile Tabella */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            min-width: 90px;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <label class="label-esterna">Inserisci qui</label>
+
+        <div class="input-row">
+            <input type="text" id="dato-testo" placeholder="Importo...">
+            <select id="tipo-descrizione">
+                <option value="Stipendio/Altro">Stipendio/Altro</option>
+                <option value="Cibo">Cibo</option>
+                <option value="Telefono">Telefono</option>
+                <option value="Sky">Sky</option>
+                <option value="Telepass">Telepass</option>
+                <option value="Riscaldamento">Riscaldamento</option>
+                <option value="Corrente elettrica">Corrente elettrica</option>
+                <option value="Ammnistratore">Ammnistratore</option>
+                <option value="Spese impreviste">Spese impreviste</option>
+                <option value="IMU">IMU</option>
+            </select>
+            <label for="inizio">Seleziona una data:</label>
+            <input type="date" id="data-day" name="trip-start" value="today">
+        </div>
+        <button class="btn btn-verde" id="btn-spedisci">Spedisci</button>
+        <button class="btn btn-red" id="btn-reset-database">Reset Database</button>
+        <button class="btn btn-blue" id="btn-export">Export To Excel</button>
+    </div>
+    <h2 id="display-anno" style="text-align: center; margin-top: 30px;"></h2>
+    <table id="tabella-mesi">
+        <thead>
+            <tr>
+                <th>Settembre</th>
+                <th>Ottobre</th>
+                <th>Novembre</th>
+                <th>Dicembre</th>
+                <th>Gennaio</th>
+                <th>Febbraio</th>
+                <th>Marzo</th>
+                <th>Aprile</th>
+                <th>Maggio</th>
+                <th>Giugno</th>
+                <th>Luglio</th>
+                <th>Agosto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="riga-dati">
+                <td id="Settembre"></td>
+                <td id="Ottobre"></td>
+                <td id="Novembre"></td>
+                <td id="Dicembre"></td>
+                <td id="Gennaio"></td>
+                <td id=Febbraio></td>
+                <td id="Marzo"></td>
+                <td id="Aprile"></td>
+                <td id="Maggio"></td>
+                <td id="Giugno"></td>
+                <td id="Luglio"></td>
+                <td id="Agosto"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table id="tabella-risparmio">
+        <thead>
+            <tr>
+                <th>Stipendio Totale</th>
+                <th>Spesa Totale</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="riga-risp-dati">
+                <td id="Risp"></td>
+                <td id="Spes"></td>
+            </tr>
+        </tbody>
+    </table>
+    <script src="HMI.js" defer></script>
+    <script src="dexie.js"></script>
+    <script src="xlsx.full.min.js"></script>
+</body>
+
+</html>
