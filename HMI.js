@@ -1,7 +1,9 @@
 const db = new Dexie("BilancioFamiliare");
 const currentYear = new Date().getFullYear();
 db.version(1).stores({ movimenti: '++id, tipo, importo, data, categoria' });
-
+let yValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let yValues1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+let yValues2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 document.addEventListener('DOMContentLoaded', async function () {
 
     const year = document.getElementById('display-anno');
@@ -11,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const date = document.getElementById('data-day'); //data della spesa
     const typeMoney = document.getElementById('tipo-descrizione'); //categoria se e cibo/telefono o altro
     const exportData = document.getElementById('btn-export');
+    //const importData = document.getElementById('btn-import');
 
     if (year) {
         year.innerHTML = "ANNO:" + currentYear;
@@ -21,22 +24,27 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     if (SendButton) {
         SendButton.addEventListener('click', function (evento) {
-            if (Number(money.value) <= 0) {
-                alert("Per favore, inserisci un numero valido, cioè maggiore di 0!");
-                return;
+            if (isNumberOrString(money.value)) {
+                if (Number(money.value) <= 0) {
+                    alert("Per favore, inserisci un numero valido, cioè maggiore di 0!");
+                    return;
+                }
+                else {
+                    typeInOrOut = 'Entrata';
+                    numberMoney = Number(money.value);
+                    if (typeMoney.value != "Stipendio" && typeMoney.value != "Buoni Pasto") {
+                        numberMoney = numberMoney * (-1);
+                        typeInOrOut = 'Spesa';
+                    }
+                }
+
+                console.log('Il bottone è stato cliccato!');
+                AddDatabaseRow(typeInOrOut, numberMoney, date.value, typeMoney.value);
+                updateTables();
             }
             else {
-                typeInOrOut = 'Entrata';
-                numberMoney = Number(money.value);
-                if (typeMoney.value != "Stipendio/Altro") {
-                    numberMoney = numberMoney * (-1);
-                    typeInOrOut = 'Spesa';
-                }
+                alert("Nell'importo non hai inserito un numero!");
             }
-
-            console.log('Il bottone è stato cliccato!');
-            AddDatabaseRow(typeInOrOut, numberMoney, date.value, typeMoney.value);
-            updateTables();
         });
     }
     else {
@@ -55,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     updateTables();
 
-    if (exportData ) {
+    if (exportData) {
 
         exportData.addEventListener('click', async function (evento) {
             const dataDBcheck = await getDb();
@@ -70,16 +78,42 @@ document.addEventListener('DOMContentLoaded', async function () {
     else {
         console.log('exportData not found');
     }
+
 });
+
+function importExcel() {
+    let input = document.createElement('input');
+    input.type = 'file';
+
+    input.onchange = async (_) => {
+        let file = Array.from(input.files);
+        if ((file[0].name.includes(".xlsx") || file[0].name.includes(".xls")) && file.length != 0) {
+
+            const data = await file[0].arrayBuffer();
+            const workbook = XLSX.read(data, { type: 'array' });
+            const jsonResult = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+
+            for (let indexItem = 0; indexItem < jsonResult.length; indexItem++) {
+                AddDatabaseRow(jsonResult[indexItem].tipo, jsonResult[indexItem].importo, jsonResult[indexItem].data, jsonResult[indexItem].descrizione);
+            }
+            updateTables();
+        }
+        else {
+            alert("Non è .xlsx il file che vuoi importare!");
+        }
+    };
+    input.click();
+}
 
 async function updateTables() {
 
     let MonthData = 0;//Array(12).fill(0);
-    let totalSum = [0, 0];
+    let totalSum = [0, 0, 0];
     const arrayMonth = [['Settembre', 'Ottobre', 'Novembre', 'Dicembre', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto'],
     [8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7]];//in java months start 0 to 11 with 11 december
-    const TableRisp = document.getElementById('Risp');
+    const TableRedd = document.getElementById('Redd');
     const TableSpes = document.getElementById('Spes');
+    const TableRisp = document.getElementById('Risp');
     let priceMonth = 0;
     let dataDB = 0;
     let stringaDetails = "";
@@ -87,7 +121,7 @@ async function updateTables() {
 
     dataDB = await getDb();
 
-    if (dataDB.length != 0 && TableRisp && TableSpes) {
+    if (dataDB.length != 0 && TableRedd && TableSpes && TableRisp) {
         for (let index = 0; index < arrayMonth[0].length; index++) {
             priceMonth = document.getElementById(arrayMonth[0][index]);
             MonthData = 0;
@@ -99,6 +133,7 @@ async function updateTables() {
                     let classeColore = indexItem.importo >= 0 ? "txt-verde" : "txt-rosso";
 
                     MonthData += indexItem.importo;
+                    yValues[index] = MonthData;
                     stringaDetails += `<div class="${classeColore}">${indexItem.descrizione}:${indexItem.importo}€</div>`;
                     if (priceMonth) {
 
@@ -111,13 +146,18 @@ async function updateTables() {
                     }
 
                     if (indexItem.importo < 0) {
+                        yValues1[index] += (indexItem.importo * (-1));
                         totalSum[0] += indexItem.importo;
                         TableSpes.innerHTML = totalSum[0];
                     }
                     else {
+                        yValues2[index] += indexItem.importo;
                         totalSum[1] += indexItem.importo;
-                        TableRisp.innerHTML = totalSum[1];
+                        TableRedd.innerHTML = totalSum[1];
                     }
+                    myChart.update();
+                    totalSum[2] = totalSum[0] + totalSum[1];
+                    TableRisp.innerHTML = totalSum[2];
                 }
             });
         }
@@ -127,17 +167,19 @@ async function updateTables() {
             priceMonth = document.getElementById(arrayMonth[0][index]);
 
             priceMonth.innerHTML = 0;
-            TableRisp.innerHTML = 0;
+            TableRedd.innerHTML = 0;
             TableSpes.innerHTML = 0;
+            TableRisp.innerHTML = 0;
         }
     }
+    console.log("Valori in tabella per grafico:", yValues);
 }
 
 async function AddDatabaseRow(tipo, importo, data, desc) {
     try {
         let dataDef = new Date(data).getFullYear();
         if (currentYear != dataDef) {
-            alert("Anno che hai inserito non corrisponde a quello in cui ci troviamo.Il dato non sara salvato.");
+            alert("L'anno che hai inserito non corrisponde a quello in cui ci troviamo.Il dato non sara salvato.");
             return;
         }
 
@@ -158,8 +200,17 @@ async function ResetDB() {
         await db.movimenti.clear();
         await db.delete();
         location.reload();
-        console.log("Table is clear.");
+        yValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        console.log("Database is clear.");
     }
+}
+
+function isNumberOrString(valueText) {
+    let booleanFlag = true;
+    if (isNaN(parseFloat(valueText)) || valueText.trim() === '') {
+        booleanFlag = false;
+    }
+    return booleanFlag;
 }
 
 async function getDb() {
@@ -167,23 +218,35 @@ async function getDb() {
     return dataDB;
 }
 
-//------------------------------------------------------------------------not use------------------------------------------------
-async function testDatabase() {
-    try {
-        await db.open();
-        console.log("✅ Database connesso!");
+const xValues = ['Settembre', 'Ottobre', 'Novembre', 'Dicembre', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto'];
 
-        // Aggiungi un dato di prova
-        await db.movimenti.add({
-            tipo: "entrata",
-            importo: 50,
-            data: "2025-12-23",
-            categoria: "regalo"
-        });
 
-        const tutti = await db.movimenti.toArray();
-        console.log("Dati nel DB:", tutti);
-    } catch (e) {
-        console.error("Errore:", e);
-    }
-}
+const myChart = new Chart("myChart", {
+    type: "line",
+    data: {
+        labels: xValues,
+        datasets: [{
+            backgroundColor: "rgba(0, 0, 255, 0.98)",
+            borderColor: "rgba(0, 0, 255, 0.98)",
+            data: yValues,
+            label: 'Risparmio mensile',
+        },
+        {
+            backgroundColor: "rgba(245, 8, 8, 1)",
+            borderColor: "rgba(255, 0, 0, 0.97)",
+            data: yValues1,
+            label: 'Spesa mensile',
+        },
+        {
+            backgroundColor: "rgba(28, 245, 8, 1)",
+            borderColor: "rgba(51, 255, 0, 0.97)",
+            data: yValues2,
+            label: 'Reddito mensile',
+        }]
+    },
+    options: {
+        plugins: {
+            legend: true,
+        }
+    },
+});
