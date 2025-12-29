@@ -97,6 +97,11 @@
             font-size: 12px;
         }
 
+        .btn-violet {
+            background-color: #ee36f4;
+            font-size: 12px;
+        }
+
         .btn:hover {
             background-color: #218883;
         }
@@ -134,8 +139,10 @@
         <div class="input-row">
             <input type="text" id="dato-testo" placeholder="Importo...">
             <select id="tipo-descrizione">
-                <option value="Stipendio/Altro">Stipendio/Altro</option>
+                <option value="Stipendio">Stipendio</option>
+                <option value="Buoni Pasto">Buoni Pasto</option>
                 <option value="Cibo">Cibo</option>
+                <option value="Vacanze">Vacanze</option>
                 <option value="Telefono">Telefono</option>
                 <option value="Sky">Sky</option>
                 <option value="Telepass">Telepass</option>
@@ -143,6 +150,7 @@
                 <option value="Corrente elettrica">Corrente elettrica</option>
                 <option value="Amministratore">Amministratore</option>
                 <option value="Spese impreviste">Spese impreviste</option>
+                <option value="Immondizia">Immondizia</option>
                 <option value="IMU">IMU</option>
             </select>
             <label for="inizio">Seleziona una data:</label>
@@ -151,6 +159,7 @@
         <button class="btn btn-verde" id="btn-spedisci">Spedisci</button>
         <button class="btn btn-red" id="btn-reset-database">Reset Database</button>
         <button class="btn btn-blue" id="btn-export">Export To Excel</button>
+        <button class="btn btn-violet" id="btn-import" onclick="importExcel()">Import From Excel</button>
     </div>
     <h2 id="display-anno" style="text-align: center; margin-top: 30px;"></h2>
     <table id="tabella-mesi">
@@ -177,7 +186,7 @@
                 <td id="Novembre"></td>
                 <td id="Dicembre"></td>
                 <td id="Gennaio"></td>
-                <td id=Febbraio></td>
+                <td id="Febbraio"></td>
                 <td id="Marzo"></td>
                 <td id="Aprile"></td>
                 <td id="Maggio"></td>
@@ -193,19 +202,26 @@
             <tr>
                 <th>Stipendio Totale</th>
                 <th>Spesa Totale</th>
+                <th>Risparmio Totale</th>
 
             </tr>
         </thead>
         <tbody>
             <tr id="riga-risp-dati">
-                <td id="Risp"></td>
+                <td id="Redd"></td>
                 <td id="Spes"></td>
+                <td id="Risp"></td>
             </tr>
         </tbody>
     </table>
+    <div>
+        <canvas id="myChart" style="width: 50%;height: 50%;"></canvas>
+    </div>
     <script src="HMI.js" defer></script>
     <script src="dexie.js"></script>
     <script src="xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </body>
 
 </html>
