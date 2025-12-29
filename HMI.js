@@ -4,8 +4,8 @@ db.version(1).stores({ movimenti: '++id, tipo, importo, data, categoria' });
 let yValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let yValues1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 let yValues2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-document.addEventListener('DOMContentLoaded', async function () {
 
+document.addEventListener('DOMContentLoaded', async function () {
     const year = document.getElementById('display-anno');
     const SendButton = document.getElementById('btn-spedisci');
     const ResetButton = document.getElementById('btn-reset-database');
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const typeMoney = document.getElementById('tipo-descrizione'); //categoria se e cibo/telefono o altro
     const exportData = document.getElementById('btn-export');
     //const importData = document.getElementById('btn-import');
+
 
     if (year) {
         year.innerHTML = "ANNO:" + currentYear;
@@ -37,7 +38,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                         typeInOrOut = 'Spesa';
                     }
                 }
-
                 console.log('Il bottone è stato cliccato!');
                 AddDatabaseRow(typeInOrOut, numberMoney, date.value, typeMoney.value);
                 updateTables();
@@ -107,8 +107,9 @@ function importExcel() {
 
 async function updateTables() {
 
-    let MonthData = 0;//Array(12).fill(0);
+    let MonthData = [0, 0, 0];//Array(12).fill(0);
     let totalSum = [0, 0, 0];
+    //let definitionMonth = [0, 0, 0];
     const arrayMonth = [['Settembre', 'Ottobre', 'Novembre', 'Dicembre', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto'],
     [8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7]];//in java months start 0 to 11 with 11 december
     const TableRedd = document.getElementById('Redd');
@@ -124,42 +125,45 @@ async function updateTables() {
     if (dataDB.length != 0 && TableRedd && TableSpes && TableRisp) {
         for (let index = 0; index < arrayMonth[0].length; index++) {
             priceMonth = document.getElementById(arrayMonth[0][index]);
-            MonthData = 0;
+            MonthData = [0, 0, 0];
             stringaDetails = "";
-            await dataDB.forEach(indexItem => {
+            await dataDB.forEach(indexItem => { //loop to read database
                 let dataObj = new Date(indexItem.data);
-                if (dataObj.getMonth() == arrayMonth[1][index]) {
+                if (dataObj.getMonth() == arrayMonth[1][index]) { // if we are in index month then can contiune
 
                     let classeColore = indexItem.importo >= 0 ? "txt-verde" : "txt-rosso";
-
-                    MonthData += indexItem.importo;
-                    yValues[index] = MonthData;
+                    MonthData[0] += indexItem.importo;
                     stringaDetails += `<div class="${classeColore}">${indexItem.descrizione}:${indexItem.importo}€</div>`;
                     if (priceMonth) {
 
                         if (stringaDetails === "") stringaDetails = "Nessun movimento";
 
-                        priceMonth.innerHTML = ` ${MonthData.toFixed(2)}
+                        priceMonth.innerHTML = ` ${MonthData[0].toFixed(2)}
                         <div class="tooltip-dettaglio">
                         <strong>Dettaglio:</strong><hr style="border:0; border-top:1px solid #555;">
                         ${stringaDetails} </div>`;
                     }
 
                     if (indexItem.importo < 0) {
-                        yValues1[index] += (indexItem.importo * (-1));
                         totalSum[0] += indexItem.importo;
+                        MonthData[1] += (-1) * indexItem.importo;
                         TableSpes.innerHTML = totalSum[0];
                     }
                     else {
-                        yValues2[index] += indexItem.importo;
                         totalSum[1] += indexItem.importo;
+                        MonthData[2] += indexItem.importo;
                         TableRedd.innerHTML = totalSum[1];
                     }
-                    myChart.update();
+
                     totalSum[2] = totalSum[0] + totalSum[1];
                     TableRisp.innerHTML = totalSum[2];
                 }
             });
+            if (MonthData.length) {
+                yValues[index] = MonthData[0];
+                yValues1[index] = MonthData[1];
+                yValues2[index] = MonthData[2];
+            }
         }
     }
     else {
@@ -172,7 +176,11 @@ async function updateTables() {
             TableRisp.innerHTML = 0;
         }
     }
-    console.log("Valori in tabella per grafico:", yValues);
+    myChart.update();
+    // console.log("Risparmio",yValues);
+    //  console.log("Spesa",yValues1);
+    // console.log("Reddito",yValues2);
+    //console.log("Valori in tabella per grafico:", yValues);
 }
 
 async function AddDatabaseRow(tipo, importo, data, desc) {
@@ -250,3 +258,4 @@ const myChart = new Chart("myChart", {
         }
     },
 });
+
