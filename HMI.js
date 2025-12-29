@@ -87,7 +87,7 @@ function importExcel() {
 
     input.onchange = async (_) => {
         let file = Array.from(input.files);
-        if ((file[0].name.includes(".xlsx") || file[0].name.includes(".xls")) && file.length != 0) {
+        if ((file[0].name.endsWith(".xlsx") || file[0].name.endsWith(".xls")) && file.length != 0) {
 
             const data = await file[0].arrayBuffer();
             const workbook = XLSX.read(data, { type: 'array' });
