@@ -84,15 +84,19 @@ document.addEventListener('DOMContentLoaded', async function () {
 function importExcel() {
     let input = document.createElement('input');
     input.type = 'file';
-
+    input.accept = ".xlsx, .xls";
     input.onchange = async (_) => {
         let file = Array.from(input.files);
+
+        if (file.length == 0) {
+            alert("Non hai selezionato il file!");
+            return;
+        }
 
         if (file[0].name.endsWith(".xlsm")) {
             alert("Non è .xlsx il file che vuoi importare!");
             return;
         }
-
 
         if ((file[0].name.endsWith(".xlsx") || file[0].name.endsWith(".xls")) && file.length != 0) {
 
