@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         typeInOrOut = 'Spesa';
                     }
                 }
-                console.log('Il bottone è stato cliccato!');
+                // console.log('Il bottone è stato cliccato!');
                 AddDatabaseRow(typeInOrOut, numberMoney, date.value, typeMoney.value);
                 updateTables();
             }
@@ -87,6 +87,13 @@ function importExcel() {
 
     input.onchange = async (_) => {
         let file = Array.from(input.files);
+
+        if (file[0].name.endsWith(".xlsm")) {
+            alert("Non è .xlsx il file che vuoi importare!");
+            return;
+        }
+
+
         if ((file[0].name.endsWith(".xlsx") || file[0].name.endsWith(".xls")) && file.length != 0) {
 
             const data = await file[0].arrayBuffer();
