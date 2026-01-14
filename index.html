@@ -102,6 +102,12 @@
             font-size: 12px;
         }
 
+        .btn-b-light {
+            background-color: #36f4e4;
+            font-size: 12px;
+            color: rgb(14, 13, 13);
+        }
+
         .btn:hover {
             background-color: #218883;
         }
@@ -131,7 +137,7 @@
     </style>
 </head>
 
-<body>
+<body id="Inizial">
 
     <div class="main-container">
         <label class="label-esterna">Inserisci qui</label>
@@ -141,7 +147,7 @@
             <select id="tipo-descrizione">
                 <option value="Stipendio">Stipendio</option>
                 <option value="Buoni Pasto">Buoni Pasto</option>
-                <option value="Cibo">Cibo</option>
+                <option value="Spese">Spese</option>
                 <option value="Vacanze">Vacanze</option>
                 <option value="Telefono">Telefono</option>
                 <option value="Sky">Sky</option>
@@ -156,10 +162,11 @@
             <label for="inizio">Seleziona una data:</label>
             <input type="date" id="data-day" name="trip-start" value="today">
         </div>
-        <button class="btn btn-verde" id="btn-spedisci">Aggiungi</button>
-        <button class="btn btn-red" id="btn-reset-database">Cancella Dati</button>
-        <button class="btn btn-blue" id="btn-export">Esporta in Excel</button>
-        <button class="btn btn-violet" id="btn-import" onclick="importExcel()">Importa da Excel</button>
+        <button class="btn btn-verde" id="btn-spedisci">Add</button>
+        <button class="btn btn-red" id="btn-reset-database">Reset Database</button>
+        <button class="btn btn-blue" id="btn-export">Export To Excel</button>
+        <button class="btn btn-violet" id="btn-import" onclick="importExcel()">Import From Excel</button>
+       <!--  <button class="btn btn-b-light" id="btn-NextPage">NextPage</button> -->
     </div>
     <h2 id="display-anno" style="text-align: center; margin-top: 30px;"></h2>
     <table id="tabella-mesi">
