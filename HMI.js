@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     const date = document.getElementById('data-day'); //data della spesa
     const typeMoney = document.getElementById('tipo-descrizione'); //categoria se e cibo/telefono o altro
     const exportData = document.getElementById('btn-export');
-    const NextPage = document.getElementById('btn-NextPage');
-    const BackPage = document.getElementById('btn-ComeBack');
+   /*  const NextPage = document.getElementById('btn-NextPage');
+    const BackPage = document.getElementById('btn-ComeBack'); */
 
     if (document.body.id == "Inizial")
         EnableChart();
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.log('exportData not found');
     }
 
-    if (NextPage) {
+    /* if (NextPage) {
         NextPage.addEventListener('click', function (evento) {
             window.location.href = "NewPage.html";
         });
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     } else {
         console.log('BackPage not found');
-    }
+    } */
 });
 
 function importExcel() {
